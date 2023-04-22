@@ -1,26 +1,25 @@
 import os
-from flask import Flask, request, redirect, url_for, send_from_directory
+import flask
+from flask import Flask, request, redirect, url_for, send_from_directory, make_response, jsonify
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = 'static/uploads/'
 
 app = Flask(__name__)
+CORS(app)
 app.secret_key = "secret key"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 @app.route('/upload', methods=['POST'])
 def upload_video():
-    if 'file' not in request.files:
-        return "No file"
+    response = flask.Response()
     file = request.files['file']
-    if file.filename == '':
-        return "No file selected"
-    else:
-        filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        # print('upload_video filename: ' + filename)
-        return "Uploaded successfully"
+    filename = secure_filename(file.filename)
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    print(filename)
+    return flask.Response(filename, 200)
 
 
 @app.route('/handle/<string:filename>', methods=['GET'])
@@ -41,4 +40,4 @@ def display_video(filename):
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='localhost', port=3000)
