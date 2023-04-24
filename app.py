@@ -33,13 +33,6 @@ def handle_video(filename):
 def download_video(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
-
-@app.route('/display/<string:filename>')
-def display_video(filename):
-    # print('display_video filename: ' + filename)
-    return redirect(url_for('static', filename='uploads/' + filename), code=301)
-
-
 def get_chunk(file_path, byte1=None, byte2=None):
     file_size = os.stat(file_path).st_size
     start = 0
@@ -77,6 +70,10 @@ def get_file(filename):
     response.headers.add('Accept-Ranges', 'bytes')
     return response
 
+@app.route('/delete_video/<string:filename>')
+def delete_video(filename):
+    os.remove(os.path.join(UPLOAD_FOLDER, filename))
+    return Response('deleted', 200)
 
 if __name__ == "__main__":
     app.run(host='localhost', port=3000)
